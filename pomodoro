@@ -49,8 +49,9 @@ def tick(duration):
     return interrupt
 
 
-def play_alarm(filename):
-    cmd = ["mpg123", filename]
+def play_alarm(filename, volume=100):
+    scale = 32768 * volume / 100
+    cmd = ["mpg123", "-f", str(int(scale)), filename]
     try:
         p = subprocess.Popen(cmd, stdout=DEV_NULL, stderr=subprocess.PIPE)
         p.wait()
@@ -70,8 +71,8 @@ def write_pomo(start, stop, tag):
     fd.close()
 
 
-@modifiers.kwoargs('repeat', 'alarm', 'notif')
-def main(work=60, rest=5, repeat=10, alarm=True, notif=False):
+@modifiers.kwoargs('repeat', 'alarm', 'notif', 'volume')
+def main(work=60, rest=5, repeat=10, alarm=True, notif=False, volume=100):
     """
     work : int
         nb of minuntes of work
@@ -88,6 +89,9 @@ def main(work=60, rest=5, repeat=10, alarm=True, notif=False):
     notif : bool
         whether to send a message box each time a pomodoro is finished or
         started
+
+    volume : int
+        percentage of volume for mpg123
     """
     for _ in range(repeat):
         display("Work now")
@@ -98,7 +102,7 @@ def main(work=60, rest=5, repeat=10, alarm=True, notif=False):
         stop = datetime.now()
         write_pomo(start, stop, "work")
         if alarm:
-            play_alarm(ALARM)
+            play_alarm(ALARM, volume=volume)
         if notif:
             notify('pomodoro', 'Finished pomo, rest now.')
         display("Rest now")
@@ -110,7 +114,7 @@ def main(work=60, rest=5, repeat=10, alarm=True, notif=False):
         write_pomo(start, stop, "rest")
 
         if alarm:
-            play_alarm(ALARM)
+            play_alarm(ALARM, volume=volume)
         if notif:
             notify('pomodoro', 'Finished rest, work now.')
         display("Cycle complete")
