@@ -38,16 +38,17 @@ def notify(title, content, more=''):
 
 
 def tick(duration, display=False):
+    interrupt = False
+
     try:
         if display:
             print(duration)
         time.sleep(60)
-        tick(duration-1, display)
+        interrupt = tick(duration-1, display)
     except KeyboardInterrupt:
         print("Interrupting")
         interrupt = True
-    else:
-        interrupt = False
+
     return interrupt
 
 
