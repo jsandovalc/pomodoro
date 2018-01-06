@@ -18,7 +18,6 @@ else:
     has_qt = True
 
 
-display = print
 this_dir = os.path.dirname(__file__)
 ALARM = "{}/../../clock.mp3".format(this_dir)
 DATA_FILENAME = os.path.expanduser("~/.pomodoro")
@@ -38,11 +37,14 @@ def notify(title, content, more=''):
     app.exec_()
 
 
-def tick(duration):
+def tick(duration, display=False):
     try:
-        time.sleep(duration)
+        if display:
+            print(duration)
+        time.sleep(60)
+        tick(duration-1, display)
     except KeyboardInterrupt:
-        display("Interrupting")
+        print("Interrupting")
         interrupt = True
     else:
         interrupt = False
@@ -71,8 +73,9 @@ def write_pomo(start, stop, tag):
     fd.close()
 
 
-@modifiers.kwoargs('repeat', 'alarm', 'notif', 'volume')
-def main(work=60, rest=5, repeat=10, alarm=True, notif=False, volume=100):
+@modifiers.kwoargs('repeat', 'alarm', 'notif', 'volume', 'display')
+def main(work=60, rest=5, repeat=10, alarm=True, notif=False, volume=100,
+         display=False):
     """
     work : int
         nb of minuntes of work
@@ -92,11 +95,15 @@ def main(work=60, rest=5, repeat=10, alarm=True, notif=False, volume=100):
 
     volume : int
         percentage of volume for mpg123
+
+    display : bool
+        whether to show remaining time or not.
+
     """
     for _ in range(repeat):
-        display("Work now")
+        print("Work now")
         start = datetime.now()
-        interrupted = tick(int(work) * 60)
+        interrupted = tick(int(work), display)
         if interrupted:
             break
         stop = datetime.now()
@@ -105,7 +112,7 @@ def main(work=60, rest=5, repeat=10, alarm=True, notif=False, volume=100):
             play_alarm(ALARM, volume=volume)
         if notif:
             notify('pomodoro', 'Finished pomo, rest now.')
-        display("Rest now")
+        print("Rest now")
         start = datetime.now()
         interrupted = tick(int(rest) * 60)
         if interrupted:
@@ -117,7 +124,7 @@ def main(work=60, rest=5, repeat=10, alarm=True, notif=False, volume=100):
             play_alarm(ALARM, volume=volume)
         if notif:
             notify('pomodoro', 'Finished rest, work now.')
-        display("Cycle complete")
+        print("Cycle complete")
 
 
 if __name__ == "__main__":
