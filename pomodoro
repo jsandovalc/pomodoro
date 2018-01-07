@@ -121,7 +121,7 @@ def main(work=60, rest=5, repeat=10, alarm=True, notif=False, volume=100,
             notify('pomodoro', 'Finished pomo, rest now.')
         print("Rest now")
         start = datetime.now()
-        interrupted = tick(int(rest) * 60)
+        interrupted = tick(int(rest), display)
         if interrupted:
             break
         stop = datetime.now()
