@@ -38,19 +38,25 @@ def notify(title, content, more=''):
 
 
 def tick(duration, display=False):
-    interrupt = False
+    """Sleep every minute until duration is 0
+
+    Returns
+    -------
+    bool
+        Whether it was interrupted or it ended the duration.
+
+    """
+    if duration <= 0:
+        return False
 
     try:
         if display:
             print(duration)
         time.sleep(60)
-        interrupt = tick(duration-1, display)
+        return tick(duration-1, display)
     except KeyboardInterrupt:
         print("Interrupting")
-        interrupt = True
-
-    return interrupt
-
+        return True
 
 def play_alarm(filename, volume=100):
     scale = 32768 * volume / 100
