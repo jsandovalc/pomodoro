@@ -51,7 +51,7 @@ def tick(duration, display=False):
 
     try:
         if display:
-            print(duration)
+            print(f'{duration} \r', end='')
         time.sleep(60)
         return tick(duration-1, display)
     except KeyboardInterrupt:
